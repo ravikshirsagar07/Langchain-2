@@ -10,30 +10,30 @@ The application separates concerns between the user interface, backend RAG pipel
 
 ```mermaid
 graph TD
-    User([User / Browser])
+    User(["User / Browser"])
     
-    subgraph Streamlit_App [Streamlit Application (Frontend)]
-        UI[User Interface]
-        Upload[Upload Documents]
-        Chat[Chat Interface]
-        History[Chat History State]
-        Sources[Source Documents Viewer]
+    subgraph Streamlit_App ["Streamlit Application (Frontend)"]
+        UI["User Interface"]
+        Upload["Upload Documents"]
+        Chat["Chat Interface"]
+        History["Chat History State"]
+        Sources["Source Documents Viewer"]
     end
 
-    subgraph LangChain_Backend [LangChain Backend (Orchestration)]
-        RC[Retrieval Chain]
-        HA_Retriever[History-Aware Retriever]
-        Prompt[Prompt Template Builder]
-        QA_Chain[QA Stuff Documents Chain]
+    subgraph LangChain_Backend ["LangChain Backend (Orchestration)"]
+        RC["Retrieval Chain"]
+        HA_Retriever["History-Aware Retriever"]
+        Prompt["Prompt Template Builder"]
+        QA_Chain["QA Stuff Documents Chain"]
     end
 
-    subgraph Data_Stores [Data Stores (Local)]
-        DS[(Document Store /data)]
-        VS[(Vector Store FAISS)]
+    subgraph Data_Stores ["Data Stores (Local)"]
+        DS[("Document Store (/data)")]
+        VS[("Vector Store (FAISS)")]
     end
 
-    subgraph External_APIs [External APIs]
-        OpenAI[OpenAI API / LLM]
+    subgraph External_APIs ["External APIs"]
+        OpenAI["OpenAI API / LLM"]
     end
 
     User -->|Upload / Chat| UI
