@@ -1,0 +1,8 @@
+Gemini 3.5 Flash is a state-of-the-art lightweight AI model developed by Google DeepMind.
+It is designed for speed, efficiency, and advanced reasoning capabilities.
+This model supports multimodal processing, allowing it to analyze images, text, and audio seamlessly.
+Antigravity is a coding assistant agent built to pair program with developers.
+It uses advanced tools and workspace context to assist in code modification, system design, and debugging.
+Streamlit is an open-source Python framework used to create custom web apps for machine learning and data science.
+LangChain is a popular framework for building applications powered by large language models (LLMs).
+FAISS (Facebook AI Similarity Search) is a library for efficient similarity search and clustering of dense vectors.
