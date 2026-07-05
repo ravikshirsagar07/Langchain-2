@@ -25,7 +25,7 @@ def get_document_loader(file_path: str):
     else:
         raise ValueError(f"Unsupported file format: {ext}")
 
-def ingest_documents(file_paths: list[str], faiss_db_path: str = "faiss_index") -> bool:
+def ingest_documents(file_paths: list[str], faiss_db_path: str = "faiss_index", openai_api_key: str = None) -> bool:
     """
     Loads files, splits them into chunks (size 1000, overlap 200),
     generates OpenAI embeddings, and indexes them in a local FAISS store.
@@ -60,7 +60,7 @@ def ingest_documents(file_paths: list[str], faiss_db_path: str = "faiss_index") 
         return False
 
     # Embedding and Vector Store Ingestion
-    embeddings = OpenAIEmbeddings()
+    embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
     
     # If FAISS index already exists, load and merge/add; otherwise create new
     if os.path.exists(os.path.join(faiss_db_path, "index.faiss")):
@@ -76,7 +76,7 @@ def ingest_documents(file_paths: list[str], faiss_db_path: str = "faiss_index") 
     db.save_local(faiss_db_path)
     return True
 
-def get_rag_chain(faiss_db_path: str = "faiss_index", model_name: str = "gpt-4o-mini"):
+def get_rag_chain(faiss_db_path: str = "faiss_index", model_name: str = "gpt-4o-mini", openai_api_key: str = None):
     """
     Creates and returns a conversational RAG retrieval chain using LangChain.
     """
@@ -84,12 +84,12 @@ def get_rag_chain(faiss_db_path: str = "faiss_index", model_name: str = "gpt-4o-
         return None
 
     # Load FAISS index
-    embeddings = OpenAIEmbeddings()
+    embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
     db = FAISS.load_local(faiss_db_path, embeddings, allow_dangerous_deserialization=True)
     retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 5})
 
     # Initialize LLM
-    llm = ChatOpenAI(model=model_name, temperature=0.1)
+    llm = ChatOpenAI(model=model_name, temperature=0.1, openai_api_key=openai_api_key)
 
     # 1. Contextualize query
     contextualize_q_system_prompt = (

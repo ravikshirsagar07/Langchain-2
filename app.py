@@ -88,16 +88,17 @@ if "rag_chain" not in st.session_state:
     st.session_state.rag_chain = None
 if "last_sources" not in st.session_state:
     st.session_state.last_sources = []
-if "api_key_configured" not in st.session_state:
-    st.session_state.api_key_configured = bool(os.getenv("OPENAI_API_KEY"))
+if "api_key" not in st.session_state:
+    st.session_state.api_key = os.getenv("OPENAI_API_KEY", "")
 
 # Refresh RAG chain if vector db exists and API key is present
 def init_rag_chain(model_name):
-    if st.session_state.api_key_configured and os.path.exists(os.path.join(FAISS_DB_PATH, "index.faiss")):
+    if st.session_state.api_key and os.path.exists(os.path.join(FAISS_DB_PATH, "index.faiss")):
         try:
             st.session_state.rag_chain = get_rag_chain(
                 faiss_db_path=FAISS_DB_PATH, 
-                model_name=model_name
+                model_name=model_name,
+                openai_api_key=st.session_state.api_key
             )
         except Exception as e:
             st.warning(f"Error loading vector index: {e}")
@@ -120,13 +121,11 @@ with st.sidebar:
     st.title("Settings & Ingestion")
     
     # 1. API Key Check
-    api_key_input = os.getenv("OPENAI_API_KEY", "")
-    if not st.session_state.api_key_configured:
+    if not st.session_state.api_key:
         st.warning("⚠️ OpenAI API Key is missing.")
         api_key_input = st.text_input("Enter OpenAI API Key:", type="password")
         if api_key_input:
-            os.environ["OPENAI_API_KEY"] = api_key_input
-            st.session_state.api_key_configured = True
+            st.session_state.api_key = api_key_input
             st.success("API Key set successfully!")
             st.rerun()
     else:
@@ -164,7 +163,7 @@ with st.sidebar:
     ingest_clicked = st.button("🚀 Ingest & Index Documents", use_container_width=True)
     
     if ingest_clicked:
-        if not st.session_state.api_key_configured:
+        if not st.session_state.api_key:
             st.error("Please configure your OpenAI API Key first!")
         elif not uploaded_files:
             st.error("Please select at least one document to ingest.")
@@ -177,7 +176,7 @@ with st.sidebar:
                         f.write(file.getvalue())
                     saved_paths.append(path)
                 
-                success = ingest_documents(saved_paths, FAISS_DB_PATH)
+                success = ingest_documents(saved_paths, FAISS_DB_PATH, openai_api_key=st.session_state.api_key)
                 if success:
                     st.success("Documents successfully indexed!")
                     init_rag_chain(selected_model)
